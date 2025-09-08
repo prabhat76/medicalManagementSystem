@@ -1,0 +1,14 @@
+# Railway Deployment Configuration
+services:
+  web:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://*:$PORT
+    healthcheck:
+      path: /
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes: []

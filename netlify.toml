@@ -1,22 +1,16 @@
-# Alternative simple configuration for Netlify
 [build]
-  # Simple build command - specify exact project file  
-  command = "dotnet publish ./MedicalWebApp.csproj -c Release -o publish"
+  # This creates a simple explanation page for Netlify
+  command = "echo 'Creating static explanation page...'"
   
-  # Publish directory
-  publish = "publish"
+  # Publish the static explanation site
+  publish = "static-site"
 
 [build.environment]
-  # .NET version for Netlify - use 8.0 (Netlify supported)
+  # Not needed for static site, but keeping for reference
   DOTNET_VERSION = "8.0.x"
-  ASPNETCORE_ENVIRONMENT = "Production"
 
-# For ASP.NET Core applications, we need specific settings
-[build.processing]
-  skip_processing = true
-
-# Health and API endpoints
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Cache-Control = "no-cache"
+# Redirects for the explanation page
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
