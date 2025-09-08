@@ -51,6 +51,33 @@ builder.Services.AddScoped<IPatientService, DatabasePatientService>();
 
 var app = builder.Build();
 
+// 🗄️ Ensure database is created and migrations are applied
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<MedicalDbContext>();
+        
+        // Ensure database is created and apply any pending migrations
+        if (app.Environment.IsProduction())
+        {
+            app.Logger.LogInformation("🗄️ Applying database migrations in production...");
+            await context.Database.MigrateAsync();
+            app.Logger.LogInformation("✅ Database migrations completed successfully!");
+        }
+        else
+        {
+            // For development, just ensure database is created
+            await context.Database.EnsureCreatedAsync();
+        }
+    }
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "❌ Error during database initialization: {Message}", ex.Message);
+    // Continue anyway - don't crash the app for database issues
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
