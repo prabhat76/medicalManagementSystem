@@ -1,14 +1,14 @@
-# Railway Deployment Configuration
-services:
-  web:
-    build:
-      dockerfile: Dockerfile
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: http://*:$PORT
-    healthcheck:
-      path: /
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    volumes: []
+# Railway will auto-detect the Dockerfile and deploy accordingly
+# This file provides optional configuration
+
+[build]
+# Railway will automatically use the Dockerfile in the root directory
+
+[deploy]
+# Restart policy
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+# Health check (optional - Railway has defaults)
+healthcheckPath = "/"
+healthcheckTimeout = 300

@@ -1,0 +1,65 @@
+# Docker ignore file for .NET application
+
+# Build outputs
+bin/
+obj/
+publish/
+
+# .NET
+*.user
+*.suo
+*.cache
+*.docstates
+_ReSharper.*
+*.csproj.user
+*.build.csdef
+*.publish.xml
+*.publishsettings
+*.pubxml
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE files
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Static site files (for Netlify)
+static-site/
+
+# Configuration files that shouldn't be in Docker
+netlify.toml
+railway.toml
+render.yaml
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
