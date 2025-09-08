@@ -4,6 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 🚀 Configure for Railway deployment
+builder.WebHost.ConfigureKestrel(options =>
+{
+    var port = Environment.GetEnvironmentVariable("PORT");
+    if (!string.IsNullOrEmpty(port) && int.TryParse(port, out int portNumber))
+    {
+        options.ListenAnyIP(portNumber);
+    }
+});
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 
@@ -86,7 +96,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// 🌐 Only use HTTPS redirection in development - Railway handles HTTPS at load balancer
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseStaticFiles(); // .NET 8.0 compatible static files
 
