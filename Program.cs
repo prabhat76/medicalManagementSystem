@@ -20,27 +20,64 @@ builder.Services.AddRazorPages();
 // Configure Entity Framework with multiple database providers
 builder.Services.AddDbContext<MedicalDbContext>(options =>
 {
-    // Try to get DATABASE_URL from environment (GitHub/Neon integration)
+    // Try to get DATABASE_URL from environment (Railway/Neon integration)
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     var connectionString = databaseUrl ?? builder.Configuration.GetConnectionString("DefaultConnection");
+    
+    Console.WriteLine($"🔍 DATABASE_URL found: {!string.IsNullOrEmpty(databaseUrl)}");
+    Console.WriteLine($"🔍 Connection string (first 30 chars): {connectionString?.Substring(0, Math.Min(30, connectionString?.Length ?? 0))}...");
     
     // Check if we're in production or if PostgreSQL connection is specified
     if (builder.Environment.IsProduction() || 
         (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("neon.tech")) || 
-        (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("postgres://")) ||
+        (!string.IsNullOrEmpty(connectionString) && (connectionString.Contains("postgres://") || connectionString.Contains("postgresql://"))) ||
         !string.IsNullOrEmpty(databaseUrl))
     {
-        // Parse DATABASE_URL format if needed (postgres://user:pass@host:port/db)
-        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+        try
         {
-            var uri = new Uri(connectionString);
-            var npgsqlConnectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
-            options.UseNpgsql(npgsqlConnectionString);
+            // Parse DATABASE_URL format if needed (postgres:// or postgresql://user:pass@host:port/db)
+            if (!string.IsNullOrEmpty(connectionString) && 
+                (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
+            {
+                var uri = new Uri(connectionString);
+                var database = uri.AbsolutePath.Trim('/');
+                var userInfo = uri.UserInfo.Split(':');
+                
+                if (userInfo.Length != 2 || string.IsNullOrEmpty(database))
+                {
+                    throw new ArgumentException("Invalid DATABASE_URL format");
+                }
+                
+                var npgsqlConnectionString = $"Host={uri.Host};Port={uri.Port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
+                Console.WriteLine($"✅ Using parsed PostgreSQL connection string");
+                options.UseNpgsql(npgsqlConnectionString);
+            }
+            else if (!string.IsNullOrEmpty(connectionString))
+            {
+                // Use PostgreSQL connection string as-is (already in Npgsql format)
+                Console.WriteLine($"✅ Using direct PostgreSQL connection string");
+                options.UseNpgsql(connectionString);
+            }
+            else
+            {
+                // Fallback to PostgreSQL connection from appsettings in production
+                var fallbackConnection = builder.Configuration.GetConnectionString("PostgreSQLConnection");
+                if (!string.IsNullOrEmpty(fallbackConnection))
+                {
+                    Console.WriteLine($"⚠️ Using fallback PostgreSQL connection from appsettings");
+                    options.UseNpgsql(fallbackConnection);
+                }
+                else
+                {
+                    throw new ArgumentException("No valid database connection string found - neither DATABASE_URL nor PostgreSQLConnection available");
+                }
+            }
         }
-        else if (!string.IsNullOrEmpty(connectionString))
+        catch (Exception ex)
         {
-            // Use PostgreSQL for production (Neon)
-            options.UseNpgsql(connectionString);
+            Console.WriteLine($"❌ Database connection error: {ex.Message}");
+            Console.WriteLine($"❌ Connection string: {connectionString}");
+            throw;
         }
     }
     else if (!string.IsNullOrEmpty(connectionString) && (connectionString.Contains("mysql") || connectionString.Contains("3306")))
