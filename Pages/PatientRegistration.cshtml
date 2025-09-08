@@ -1,0 +1,101 @@
+@page
+@model MedicalWebApp.Pages.PatientRegistrationModel
+@{
+    ViewData["Title"] = "Patient Registration";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Patient Registration</h2>
+                </div>
+                <div class="card-body">
+                    @if (Model.IsSuccess)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Success!</strong> Patient registration completed successfully!
+                            @if (Model.NewPatientId.HasValue)
+                            {
+                                <br><strong>Patient ID:</strong> @Model.NewPatientId.Value
+                                <br><small>You can now <a asp-page="/Patients" class="alert-link">view all patients</a> or register another patient below.</small>
+                            }
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Patient.FirstName" class="form-label"></label>
+                                <input asp-for="Patient.FirstName" class="form-control" />
+                                <span asp-validation-for="Patient.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Patient.LastName" class="form-label"></label>
+                                <input asp-for="Patient.LastName" class="form-control" />
+                                <span asp-validation-for="Patient.LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Patient.DateOfBirth" class="form-label"></label>
+                                <input asp-for="Patient.DateOfBirth" class="form-control" type="date" />
+                                <span asp-validation-for="Patient.DateOfBirth" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Patient.PhoneNumber" class="form-label"></label>
+                                <input asp-for="Patient.PhoneNumber" class="form-control" />
+                                <span asp-validation-for="Patient.PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Patient.Email" class="form-label">
+                                <i class="fas fa-envelope me-1"></i>Email Address
+                            </label>
+                            <input asp-for="Patient.Email" class="form-control" placeholder="patient@example.com" />
+                            <span asp-validation-for="Patient.Email" class="text-danger"></span>
+                            <div class="form-text">
+                                <small><i class="fas fa-info-circle me-1"></i>Email must be unique - we use this to prevent duplicate registrations.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Patient.Address" class="form-label"></label>
+                            <textarea asp-for="Patient.Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Patient.Address" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Patient.MedicalHistory" class="form-label"></label>
+                            <textarea asp-for="Patient.MedicalHistory" class="form-control" rows="4" placeholder="Enter any relevant medical history, allergies, or current medications"></textarea>
+                            <span asp-validation-for="Patient.MedicalHistory" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Register Patient
+                            </button>
+                            <a asp-page="/Patients" class="btn btn-outline-info">
+                                <i class="fas fa-users me-2"></i>View All Patients
+                            </a>
+                            <a asp-page="/Index" class="btn btn-secondary">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
