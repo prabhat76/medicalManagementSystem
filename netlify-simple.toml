@@ -1,0 +1,22 @@
+# Alternative simple configuration for Netlify
+[build]
+  # Simple build command - specify exact project file  
+  command = "dotnet publish ./MedicalWebApp.csproj -c Release -o publish"
+  
+  # Publish directory
+  publish = "publish"
+
+[build.environment]
+  # .NET version for Netlify
+  DOTNET_VERSION = "9.0.x"
+  ASPNETCORE_ENVIRONMENT = "Production"
+
+# For ASP.NET Core applications, we need specific settings
+[build.processing]
+  skip_processing = true
+
+# Health and API endpoints
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache"

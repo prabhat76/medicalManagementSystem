@@ -1,0 +1,26 @@
+[build]
+  # Build command - use our custom build script
+  command = "./build.sh"
+  
+  # Publish directory - where the built files are located
+  publish = "publish"
+
+[build.environment]
+  # .NET version
+  DOTNET_VERSION = "9.0.x"
+  
+  # Environment for the build
+  ASPNETCORE_ENVIRONMENT = "Production"
+
+# Optional: Configure redirects for SPA routing (if needed)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Health check endpoint
+[[headers]]
+  for = "/health"
+  [headers.values]
+    Cache-Control = "no-cache"
