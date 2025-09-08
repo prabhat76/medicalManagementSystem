@@ -1,0 +1,23 @@
+# Render Deployment Configuration
+services:
+  - type: web
+    name: medical-web-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://*:$PORT
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medical-db
+          property: connectionString
+    healthCheckPath: /
+
+databases:
+  - name: medical-db
+    databaseName: medical_db
+    user: medical_user
+    plan: free

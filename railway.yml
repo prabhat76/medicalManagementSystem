@@ -1,0 +1,19 @@
+# Railway Service Configuration
+# This file tells Railway to use Docker instead of Nixpacks
+
+version: "2"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:$PORT
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:$PORT/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

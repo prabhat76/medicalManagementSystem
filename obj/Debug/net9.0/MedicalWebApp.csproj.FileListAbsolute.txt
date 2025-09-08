@@ -223,3 +223,10 @@
 /Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/Npgsql.dll
 /Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
 /Users/prabhatkumar/Desktop/dotnet/obj/Debug/net9.0/MedicalWebApp.sourcelink.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/web.config
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/appsettings.Development.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/appsettings.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/appsettings.Production.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/MedicalWebApp.deps.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/MedicalWebApp.runtimeconfig.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/publish/MedicalWebApp.staticwebassets.endpoints.json

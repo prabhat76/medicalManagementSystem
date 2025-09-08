@@ -1,0 +1,16 @@
+[build]
+  # This creates a simple explanation page for Netlify
+  command = "echo 'Creating static explanation page...'"
+  
+  # Publish the static explanation site
+  publish = "static-site"
+
+[build.environment]
+  # Not needed for static site, but keeping for reference
+  DOTNET_VERSION = "8.0.x"
+
+# Redirects for the explanation page
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

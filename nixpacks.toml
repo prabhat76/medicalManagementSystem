@@ -1,0 +1,14 @@
+# Railway Nixpacks Configuration
+# This file forces Railway to use .NET 8.0 and specifies the project file
+
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8"]
+
+[phases.install]
+cmds = ["dotnet restore ./MedicalWebApp.csproj"]
+
+[phases.build]
+cmds = ["dotnet publish ./MedicalWebApp.csproj --no-restore -c Release -o out"]
+
+[start]
+cmd = "./out/MedicalWebApp"
