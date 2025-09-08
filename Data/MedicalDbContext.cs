@@ -38,6 +38,29 @@ namespace MedicalWebApp.Data
                     .HasMaxLength(500);
                 entity.Property(e => e.MedicalHistory)
                     .HasMaxLength(2000);
+
+                // PostgreSQL-specific: Use TIMESTAMP instead of datetime
+                if (Database.IsNpgsql())
+                {
+                    entity.Property(e => e.DateOfBirth)
+                        .HasColumnType("timestamp without time zone");
+                    entity.Property(e => e.RegistrationDate)
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                }
+                else if (Database.IsMySql())
+                {
+                    entity.Property(e => e.DateOfBirth)
+                        .HasColumnType("datetime(6)");
+                    entity.Property(e => e.RegistrationDate)
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValueSql("NOW()");
+                }
+                else
+                {
+                    entity.Property(e => e.RegistrationDate)
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                }
                 
                 // Create unique index on email
                 entity.HasIndex(e => e.Email)
@@ -61,6 +84,29 @@ namespace MedicalWebApp.Data
                     .HasDefaultValue("Scheduled");
                 entity.Property(e => e.Notes)
                     .HasMaxLength(1000);
+
+                // PostgreSQL-specific: Use TIMESTAMP instead of datetime
+                if (Database.IsNpgsql())
+                {
+                    entity.Property(e => e.AppointmentDateTime)
+                        .HasColumnType("timestamp without time zone");
+                    entity.Property(e => e.CreatedDate)
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                }
+                else if (Database.IsMySql())
+                {
+                    entity.Property(e => e.AppointmentDateTime)
+                        .HasColumnType("datetime(6)");
+                    entity.Property(e => e.CreatedDate)
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValueSql("NOW()");
+                }
+                else
+                {
+                    entity.Property(e => e.CreatedDate)
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                }
 
                 // Configure relationship with Patient
                 entity.HasOne(e => e.Patient)

@@ -7,11 +7,43 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// Configure Entity Framework with MySQL
+// Configure Entity Framework with multiple database providers
 builder.Services.AddDbContext<MedicalDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    // Try to get DATABASE_URL from environment (GitHub/Neon integration)
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var connectionString = databaseUrl ?? builder.Configuration.GetConnectionString("DefaultConnection");
+    
+    // Check if we're in production or if PostgreSQL connection is specified
+    if (builder.Environment.IsProduction() || 
+        (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("neon.tech")) || 
+        (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("postgres://")) ||
+        !string.IsNullOrEmpty(databaseUrl))
+    {
+        // Parse DATABASE_URL format if needed (postgres://user:pass@host:port/db)
+        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+        {
+            var uri = new Uri(connectionString);
+            var npgsqlConnectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
+            options.UseNpgsql(npgsqlConnectionString);
+        }
+        else if (!string.IsNullOrEmpty(connectionString))
+        {
+            // Use PostgreSQL for production (Neon)
+            options.UseNpgsql(connectionString);
+        }
+    }
+    else if (!string.IsNullOrEmpty(connectionString) && (connectionString.Contains("mysql") || connectionString.Contains("3306")))
+    {
+        // Use MySQL for local development
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    }
+    else
+    {
+        // Fallback to SQLite for local development
+        var sqliteConnection = builder.Configuration.GetConnectionString("SqliteConnection");
+        options.UseSqlite(sqliteConnection);
+    }
 });
 
 // Register our patient service for dependency injection

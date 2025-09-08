@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ESmATKu5WMM=",
+  "dgSpecHash": "fpfngvj/2ZI=",
   "success": true,
   "projectFilePath": "/Users/prabhatkumar/Desktop/dotnet/MedicalWebApp.csproj",
   "expectedPackageFiles": [
@@ -34,6 +34,8 @@
     "/Users/prabhatkumar/.nuget/packages/microsoft.extensions.primitives/9.0.8/microsoft.extensions.primitives.9.0.8.nupkg.sha512",
     "/Users/prabhatkumar/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
     "/Users/prabhatkumar/.nuget/packages/mysqlconnector/2.4.0/mysqlconnector.2.4.0.nupkg.sha512",
+    "/Users/prabhatkumar/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
+    "/Users/prabhatkumar/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
     "/Users/prabhatkumar/.nuget/packages/pomelo.entityframeworkcore.mysql/9.0.0/pomelo.entityframeworkcore.mysql.9.0.0.nupkg.sha512",
     "/Users/prabhatkumar/.nuget/packages/sqlitepclraw.bundle_e_sqlite3/2.1.10/sqlitepclraw.bundle_e_sqlite3.2.1.10.nupkg.sha512",
     "/Users/prabhatkumar/.nuget/packages/sqlitepclraw.core/2.1.10/sqlitepclraw.core.2.1.10.nupkg.sha512",

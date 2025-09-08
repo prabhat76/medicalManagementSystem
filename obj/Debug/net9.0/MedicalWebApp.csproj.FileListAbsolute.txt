@@ -219,3 +219,7 @@
 /Users/prabhatkumar/Desktop/dotnet/obj/Debug/net9.0/MedicalW.A1EFF889.Up2Date
 /Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/MySqlConnector.dll
 /Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/Pomelo.EntityFrameworkCore.MySql.dll
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/appsettings.Production.json
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/Npgsql.dll
+/Users/prabhatkumar/Desktop/dotnet/bin/Debug/net9.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/prabhatkumar/Desktop/dotnet/obj/Debug/net9.0/MedicalWebApp.sourcelink.json
