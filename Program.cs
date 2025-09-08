@@ -5,14 +5,21 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // 🚀 Configure for Railway deployment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+Console.WriteLine($"🚀 Railway PORT environment variable: {Environment.GetEnvironmentVariable("PORT") ?? "Not Set"}");
+Console.WriteLine($"🚀 Using port: {port}");
+
 builder.WebHost.ConfigureKestrel(options =>
 {
-    var port = Environment.GetEnvironmentVariable("PORT");
-    if (!string.IsNullOrEmpty(port) && int.TryParse(port, out int portNumber))
+    if (int.TryParse(port, out int portNumber))
     {
         options.ListenAnyIP(portNumber);
+        Console.WriteLine($"🚀 Kestrel configured to listen on port {portNumber}");
     }
 });
+
+// Ensure ASPNETCORE_URLS is not conflicting
+Environment.SetEnvironmentVariable("ASPNETCORE_URLS", $"http://+:{port}");
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -24,20 +31,37 @@ builder.Services.AddDbContext<MedicalDbContext>(options =>
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     var connectionString = databaseUrl ?? builder.Configuration.GetConnectionString("DefaultConnection");
     
+    // Simple debug output that will appear in Railway logs
+    Console.WriteLine($"🔍 Environment: {builder.Environment.EnvironmentName}");
     Console.WriteLine($"🔍 DATABASE_URL found: {!string.IsNullOrEmpty(databaseUrl)}");
-    Console.WriteLine($"🔍 Connection string (first 30 chars): {connectionString?.Substring(0, Math.Min(30, connectionString?.Length ?? 0))}...");
+    Console.WriteLine($"🔍 Connection string length: {connectionString?.Length ?? 0}");
+    Console.WriteLine($"🔍 Connection string starts with: {(string.IsNullOrEmpty(connectionString) ? "NULL" : connectionString.Substring(0, Math.Min(20, connectionString.Length)))}");
+    
+    // Ensure we have a valid connection string
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        // Try fallback connections
+        connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection") 
+                        ?? builder.Configuration.GetConnectionString("SqliteConnection");
+        Console.WriteLine("⚠️ Using fallback connection string");
+    }
+    
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("No database connection string found. Please set DATABASE_URL environment variable or configure connection strings in appsettings.json");
+    }
     
     // Check if we're in production or if PostgreSQL connection is specified
     if (builder.Environment.IsProduction() || 
-        (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("neon.tech")) || 
-        (!string.IsNullOrEmpty(connectionString) && (connectionString.Contains("postgres://") || connectionString.Contains("postgresql://"))) ||
+        connectionString.Contains("neon.tech") || 
+        connectionString.Contains("postgres://") || 
+        connectionString.Contains("postgresql://") ||
         !string.IsNullOrEmpty(databaseUrl))
     {
         try
         {
             // Parse DATABASE_URL format if needed (postgres:// or postgresql://user:pass@host:port/db)
-            if (!string.IsNullOrEmpty(connectionString) && 
-                (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
+            if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
             {
                 var uri = new Uri(connectionString);
                 var database = uri.AbsolutePath.Trim('/');
@@ -45,17 +69,18 @@ builder.Services.AddDbContext<MedicalDbContext>(options =>
                 
                 if (userInfo.Length != 2 || string.IsNullOrEmpty(database))
                 {
-                    throw new ArgumentException("Invalid DATABASE_URL format");
+                    throw new ArgumentException($"Invalid DATABASE_URL format. Expected format: postgresql://user:password@host:port/database");
                 }
                 
                 var npgsqlConnectionString = $"Host={uri.Host};Port={uri.Port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
-                Console.WriteLine($"✅ Using parsed PostgreSQL connection string");
+                Console.WriteLine("✅ Using parsed PostgreSQL connection string");
+                Console.WriteLine($"✅ Parsed connection: Host={uri.Host};Port={uri.Port};Database={database};Username={userInfo[0]};...");
                 options.UseNpgsql(npgsqlConnectionString);
             }
-            else if (!string.IsNullOrEmpty(connectionString))
+            else if (connectionString.Contains("Host=") || connectionString.Contains("Server=") && connectionString.Contains("Database="))
             {
                 // Use PostgreSQL connection string as-is (already in Npgsql format)
-                Console.WriteLine($"✅ Using direct PostgreSQL connection string");
+                Console.WriteLine("✅ Using direct PostgreSQL connection string");
                 options.UseNpgsql(connectionString);
             }
             else
@@ -64,12 +89,12 @@ builder.Services.AddDbContext<MedicalDbContext>(options =>
                 var fallbackConnection = builder.Configuration.GetConnectionString("PostgreSQLConnection");
                 if (!string.IsNullOrEmpty(fallbackConnection))
                 {
-                    Console.WriteLine($"⚠️ Using fallback PostgreSQL connection from appsettings");
+                    Console.WriteLine("⚠️ Using fallback PostgreSQL connection from appsettings");
                     options.UseNpgsql(fallbackConnection);
                 }
                 else
                 {
-                    throw new ArgumentException("No valid database connection string found - neither DATABASE_URL nor PostgreSQLConnection available");
+                    throw new ArgumentException("No valid PostgreSQL connection string found - neither DATABASE_URL nor PostgreSQLConnection available");
                 }
             }
         }
