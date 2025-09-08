@@ -66,3 +66,4 @@ bld/
 !**/packages/build/
 *.nuget.props
 *.nuget.targets
+publish/
