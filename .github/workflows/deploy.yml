@@ -23,11 +23,14 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
+    - name: Install EF Core Tools
+      run: dotnet tool install --global dotnet-ef
+        
     - name: Restore dependencies
-      run: dotnet restore MedicalWebApp.csproj
+      run: dotnet restore ./MedicalWebApp.csproj
       
     - name: Build
-      run: dotnet build MedicalWebApp.csproj --no-restore --configuration Release
+      run: dotnet build ./MedicalWebApp.csproj --no-restore --configuration Release
       
     - name: Test (when tests are added)
       run: |
@@ -36,7 +39,7 @@ jobs:
         echo "✅ Tests passed (placeholder - add actual tests later)"
         
     - name: Publish
-      run: dotnet publish MedicalWebApp.csproj -c Release -o ./publish
+      run: dotnet publish ./MedicalWebApp.csproj -c Release -o ./publish
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -61,6 +64,9 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
+    - name: Install EF Core Tools
+      run: dotnet tool install --global dotnet-ef
+        
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
@@ -70,7 +76,7 @@ jobs:
     - name: Apply Database Migrations
       run: |
         echo "🗄️ Applying database migrations to production..."
-        dotnet ef database update --context MedicalDbContext --project MedicalWebApp.csproj
+        dotnet ef database update --context MedicalDbContext --project ./MedicalWebApp.csproj
       env:
         ASPNETCORE_ENVIRONMENT: Production
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
