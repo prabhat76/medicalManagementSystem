@@ -9,7 +9,7 @@ dotnet --version
 
 # Install EF Core tools if needed
 echo "🔧 Installing Entity Framework tools..."
-dotnet tool install --global dotnet-ef --version 9.0.0 || echo "EF tools already installed"
+dotnet tool install --global dotnet-ef --version 8.0.8 || echo "EF tools already installed"
 
 # Add tools to PATH
 export PATH="$PATH:/opt/buildhome/.dotnet/tools"

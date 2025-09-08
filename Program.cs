@@ -61,12 +61,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); // .NET 8.0 compatible static files
+
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages(); // .NET 8.0 compatible Razor Pages mapping
 
 app.Run();
