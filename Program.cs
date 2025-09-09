@@ -43,9 +43,26 @@ builder.Services.AddDbContext<MedicalDbContext>(options =>
             if (Uri.TryCreate(databaseUrl, UriKind.Absolute, out Uri? uri) && 
                 (uri.Scheme == "postgresql" || uri.Scheme == "postgres"))
             {
-                Console.WriteLine($"✅ Valid PostgreSQL URI detected: {uri.Scheme}://{uri.Host}:{uri.Port}");
-                Console.WriteLine("✅ Using DATABASE_URL for PostgreSQL connection");
-                options.UseNpgsql(databaseUrl);
+                // Handle missing port (Neon uses default PostgreSQL port 5432)
+                var port = uri.Port == -1 ? 5432 : uri.Port;
+                Console.WriteLine($"✅ Valid PostgreSQL URI detected: {uri.Scheme}://{uri.Host}:{port}");
+                
+                // Create a proper Npgsql connection string instead of using the URI directly
+                var host = uri.Host;
+                var database = uri.AbsolutePath.TrimStart('/');
+                var userInfo = uri.UserInfo.Split(':');
+                
+                if (userInfo.Length == 2 && !string.IsNullOrEmpty(database))
+                {
+                    var connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
+                    Console.WriteLine($"✅ Built connection string with port {port}");
+                    options.UseNpgsql(connectionString);
+                }
+                else
+                {
+                    Console.WriteLine("❌ Could not parse user info or database from URI");
+                    throw new ArgumentException("Invalid URI format - missing user info or database");
+                }
             }
             else
             {
