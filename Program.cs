@@ -2,9 +2,10 @@ using MedicalWebApp.Services;
 using MedicalWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 
+Console.WriteLine("🚀 Medical Web App Starting...");
 var builder = WebApplication.CreateBuilder(args);
 
-// 🚀 Configure for Railway deployment
+// 🚀 Configure for Railway deployment with robust port handling
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 Console.WriteLine($"🚀 Railway PORT environment variable: {Environment.GetEnvironmentVariable("PORT") ?? "Not Set"}");
 Console.WriteLine($"🚀 Using port: {port}");
