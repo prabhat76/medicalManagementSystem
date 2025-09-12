@@ -4,7 +4,7 @@
 This is an ASP.NET Core Web Application using Razor Pages for learning .NET web development. The project simulates Web Forms functionality but uses modern .NET Core technologies that work cross-platform.
 
 ## Technology Stack
-- **Framework**: ASP.NET Core 9.0 (Razor Pages)
+- **Framework**: ASP.NET Core 8.0 (Razor Pages)
 - **Language**: C#
 - **Platform**: Cross-platform (.NET Core)
 - **UI**: Razor Pages (similar to Web Forms)

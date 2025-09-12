@@ -10,9 +10,12 @@ This project serves as an introduction to .NET web development, specifically mim
 
 ### Implemented
 - ✅ Patient Registration Form
+- ✅ Patient Management (View/Search)
 - ✅ Responsive Bootstrap UI
 - ✅ Form Validation
+- ✅ Database Integration (SQLite/PostgreSQL)
 - ✅ Medical-themed Dashboard
+- ✅ Unit Tests
 
 ### Planned
 - 📋 Appointment Scheduling
@@ -23,10 +26,12 @@ This project serves as an introduction to .NET web development, specifically mim
 
 ## Technology Stack
 
-- **Framework**: ASP.NET Core 9.0
+- **Framework**: ASP.NET Core 8.0
 - **Language**: C#
 - **UI**: Razor Pages + Bootstrap 5
+- **Database**: SQLite (development), PostgreSQL (production)
 - **Platform**: Cross-platform (.NET Core)
+- **Testing**: xUnit with Entity Framework InMemory provider
 
 ## Project Structure
 
@@ -36,6 +41,9 @@ This project serves as an introduction to .NET web development, specifically mim
 │   ├── Shared/            # Shared layouts and partials
 │   ├── Index.cshtml       # Dashboard/Home page
 │   └── PatientRegistration.cshtml # Patient registration form
+├── Services/               # Business logic services
+├── Data/                   # Entity Framework DbContext
+├── Tests/                  # Unit tests
 ├── wwwroot/               # Static files (CSS, JS, images)
 └── Program.cs             # Application startup
 ```
@@ -74,6 +82,12 @@ dotnet run
 # Run with hot reload (watches for changes)
 dotnet watch run
 
+# Run tests
+dotnet test
+
+# Run tests with detailed output
+dotnet test --logger "console;verbosity=detailed"
+
 # Create a new Razor page
 dotnet new page -n NewPageName -o Pages
 
@@ -99,6 +113,35 @@ This project helps you learn:
    - Object-oriented programming
    - Data annotations
    - LINQ (when database is added)
+
+4. **Testing**
+   - Unit testing with xUnit
+   - Entity Framework InMemory testing
+   - Test-driven development concepts
+
+## Testing
+
+The project includes comprehensive unit tests for both models and services:
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with detailed output
+dotnet test --logger "console;verbosity=detailed"
+
+# Run tests with coverage (if coverlet is installed)
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+### Test Structure
+- `Tests/PatientModelTests.cs` - Tests for Patient model validation
+- `Tests/PatientServiceTests.cs` - Tests for patient business logic
+
+The tests use:
+- **xUnit** - Testing framework
+- **Entity Framework InMemory** - For database testing without actual database
+- **Data Annotations** - For model validation testing
 
 ## Key Differences from Web Forms
 
