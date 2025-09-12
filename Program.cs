@@ -6,48 +6,33 @@ Console.WriteLine("🚀 Medical Web App Starting...");
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🚀 Simple Railway port configuration
+// Configure port for deployment platforms
 var portEnv = Environment.GetEnvironmentVariable("PORT");
-Console.WriteLine($"🔍 PORT environment variable: '{portEnv ?? "null"}'");
-
-if (!string.IsNullOrEmpty(portEnv) && int.TryParse(portEnv, out int railwayPort))
+if (!string.IsNullOrEmpty(portEnv) && int.TryParse(portEnv, out int port))
 {
-    Console.WriteLine($"✅ Configuring for Railway port: {railwayPort}");
-    builder.WebHost.UseUrls($"http://*:{railwayPort}");
-}
-else
-{
-    Console.WriteLine("⚠️ No valid PORT found, using default configuration");
+    Console.WriteLine($"✅ Configuring for deployment port: {port}");
+    builder.WebHost.UseUrls($"http://*:{port}");
 }
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// 🗄️ Configure Entity Framework with detailed debugging
+// Configure Entity Framework with simplified logic
 builder.Services.AddDbContext<MedicalDbContext>(options =>
 {
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-    Console.WriteLine($"🔍 DATABASE_URL found: {!string.IsNullOrEmpty(databaseUrl)}");
-    Console.WriteLine($"🔍 DATABASE_URL length: {databaseUrl?.Length ?? 0}");
     
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        // Clean the database URL of any potential invisible characters
-        databaseUrl = databaseUrl.Trim();
-        Console.WriteLine($"🔍 DATABASE_URL (trimmed, first 50 chars): {databaseUrl.Substring(0, Math.Min(50, databaseUrl.Length))}...");
-        Console.WriteLine($"🔍 DATABASE_URL (last 10 chars): ...{databaseUrl.Substring(Math.Max(0, databaseUrl.Length - 10))}");
+        // Production: Use DATABASE_URL (PostgreSQL)
+        Console.WriteLine("✅ Using DATABASE_URL for production PostgreSQL");
         
         try
         {
-            // Test if this is a valid URI first
             if (Uri.TryCreate(databaseUrl, UriKind.Absolute, out Uri? uri) && 
                 (uri.Scheme == "postgresql" || uri.Scheme == "postgres"))
             {
-                // Handle missing port (Neon uses default PostgreSQL port 5432)
                 var port = uri.Port == -1 ? 5432 : uri.Port;
-                Console.WriteLine($"✅ Valid PostgreSQL URI detected: {uri.Scheme}://{uri.Host}:{port}");
-                
-                // Create a proper Npgsql connection string instead of using the URI directly
                 var host = uri.Host;
                 var database = uri.AbsolutePath.TrimStart('/');
                 var userInfo = uri.UserInfo.Split(':');
@@ -55,98 +40,85 @@ builder.Services.AddDbContext<MedicalDbContext>(options =>
                 if (userInfo.Length == 2 && !string.IsNullOrEmpty(database))
                 {
                     var connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
-                    Console.WriteLine($"✅ Built connection string with port {port}");
                     options.UseNpgsql(connectionString);
+                    Console.WriteLine("✅ PostgreSQL configured successfully");
                 }
                 else
                 {
-                    Console.WriteLine("❌ Could not parse user info or database from URI");
-                    throw new ArgumentException("Invalid URI format - missing user info or database");
+                    throw new ArgumentException("Invalid DATABASE_URL format");
                 }
             }
             else
             {
-                Console.WriteLine($"❌ Invalid DATABASE_URL format or scheme. Expected postgresql:// or postgres://, got: {databaseUrl?.Substring(0, Math.Min(20, databaseUrl?.Length ?? 0))}");
-                throw new ArgumentException($"Invalid DATABASE_URL format: {databaseUrl}");
+                throw new ArgumentException("Invalid DATABASE_URL format");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Failed to configure DATABASE_URL: {ex.Message}");
-            Console.WriteLine($"❌ DATABASE_URL value: '{databaseUrl}'");
-            
-            // Emergency fallback - try to reconstruct the connection string
-            Console.WriteLine("🔄 Attempting emergency fallback connection...");
-            var emergencyConnection = "Host=ep-young-feather-aev9szfg-pooler.c-2.us-east-2.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_WQhR73yTCwju;SSL Mode=Require;Trust Server Certificate=true;";
-            try
-            {
-                options.UseNpgsql(emergencyConnection);
-                Console.WriteLine("✅ Emergency fallback connection configured!");
-            }
-            catch (Exception fallbackEx)
-            {
-                Console.WriteLine($"❌ Emergency fallback also failed: {fallbackEx.Message}");
-                throw;
-            }
+            throw;
+        }
+    }
+    else if (builder.Environment.IsProduction())
+    {
+        // Production fallback to appsettings PostgreSQL
+        var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            Console.WriteLine("⚠️ Using fallback PostgreSQL connection from appsettings");
+            options.UseNpgsql(connectionString);
+        }
+        else
+        {
+            throw new InvalidOperationException("No production database connection found");
         }
     }
     else
     {
-        // Fallback to appsettings
-        var fallbackConnection = builder.Configuration.GetConnectionString("PostgreSQLConnection");
-        Console.WriteLine($"🔍 Fallback connection found: {!string.IsNullOrEmpty(fallbackConnection)}");
-        
-        if (!string.IsNullOrEmpty(fallbackConnection))
-        {
-            Console.WriteLine("⚠️ Using fallback PostgreSQL connection from appsettings");
-            options.UseNpgsql(fallbackConnection);
-        }
-        else
-        {
-            Console.WriteLine("❌ No database connection available!");
-            throw new InvalidOperationException("No database connection string found");
-        }
+        // Development: Use SQLite by default
+        var sqliteConnection = builder.Configuration.GetConnectionString("SqliteConnection") ?? "Data Source=MedicalApp.db";
+        Console.WriteLine("🔧 Development: Using SQLite database");
+        options.UseSqlite(sqliteConnection);
     }
 });
 
-// Register our patient service for dependency injection
+// Register patient service
 builder.Services.AddScoped<IPatientService, DatabasePatientService>();
 
 var app = builder.Build();
 
-// 🗄️ Ensure database is created and migrations are applied
+// Initialize database
 try
 {
-    Console.WriteLine("🗄️ Starting database initialization...");
+    Console.WriteLine("🗄️ Initializing database...");
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<MedicalDbContext>();
         
-        // Test database connection first
-        Console.WriteLine("🔍 Testing database connection...");
-        await context.Database.CanConnectAsync();
-        Console.WriteLine("✅ Database connection successful!");
-        
-        // Apply migrations in production
         if (app.Environment.IsProduction())
         {
-            Console.WriteLine("🗄️ Applying database migrations in production...");
+            // Production: Run migrations
+            Console.WriteLine("🗄️ Applying migrations for production...");
             await context.Database.MigrateAsync();
-            Console.WriteLine("✅ Database migrations completed successfully!");
         }
         else
         {
-            // For development, just ensure database is created
+            // Development: Ensure database is created
+            Console.WriteLine("🗄️ Ensuring database exists for development...");
             await context.Database.EnsureCreatedAsync();
-            Console.WriteLine("✅ Database ensured for development");
         }
+        
+        Console.WriteLine("✅ Database initialized successfully!");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ Database initialization error: {ex.Message}");
-    Console.WriteLine($"❌ Stack trace: {ex.StackTrace}");
-    // Continue anyway - don't crash the app for database issues in startup
+    Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
+    // In development, continue anyway to avoid breaking the learning experience
+    if (app.Environment.IsProduction())
+    {
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -161,5 +133,5 @@ app.UseRouting();
 app.UseAuthorization();
 app.MapRazorPages();
 
-Console.WriteLine("🚀 Medical Web App configured successfully!");
+Console.WriteLine("🚀 Medical Web App ready!");
 app.Run();

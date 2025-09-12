@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/prabhatkumar/Desktop/dotnet/MedicalWebApp.csproj": {}
+    "/home/runner/work/medicalManagementSystem/medicalManagementSystem/MedicalWebApp.csproj": {}
   },
   "projects": {
-    "/Users/prabhatkumar/Desktop/dotnet/MedicalWebApp.csproj": {
+    "/home/runner/work/medicalManagementSystem/medicalManagementSystem/MedicalWebApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/prabhatkumar/Desktop/dotnet/MedicalWebApp.csproj",
+        "projectUniqueName": "/home/runner/work/medicalManagementSystem/medicalManagementSystem/MedicalWebApp.csproj",
         "projectName": "MedicalWebApp",
-        "projectPath": "/Users/prabhatkumar/Desktop/dotnet/MedicalWebApp.csproj",
-        "packagesPath": "/Users/prabhatkumar/.nuget/packages/",
-        "outputPath": "/Users/prabhatkumar/Desktop/dotnet/obj/",
+        "projectPath": "/home/runner/work/medicalManagementSystem/medicalManagementSystem/MedicalWebApp.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/medicalManagementSystem/medicalManagementSystem/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/prabhatkumar/.nuget/NuGet/NuGet.Config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,13 +32,7 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -50,9 +44,17 @@
               "target": "Package",
               "version": "[8.0.8, )"
             },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.8.0, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
@@ -61,6 +63,16 @@
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.6.1, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.5.3, )"
             }
           },
           "imports": [
@@ -74,20 +86,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.osx-x64",
-              "version": "[8.0.19, 8.0.19]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -96,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.119/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
